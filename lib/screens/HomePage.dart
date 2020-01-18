@@ -1,5 +1,8 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mpesa/Constants.dart';
+import 'package:flutter_mpesa/env.dart';
+import 'package:flutter_mpesa/services/MpesaService.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -7,7 +10,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  MpesaService mpesaService;
+  @override
+  void initState() {
+    mpesaService = MpesaService(clientKey: Environment.CONSUMERKEY, clientSecret: Environment.CONSUMERSECRET, passKey: Environment.CONSUMERPASSKEY, baseurl: Environment.baseURl);
+    super.initState();
+  }
   var cream = Color(0xfffffdd0);
+  String phoneNumber = "0";
+  String amount = "";
+  TextEditingController _phoneNumberTextController = TextEditingController();
+  TextEditingController _amountTextController = TextEditingController();
+
+  void makePayment({String phoneNumber, String amount}) async{
+    var data = await mpesaService.initializeMpesa(amount: amount, callbackUrl: 'http://mpesa-requestbin.herokuapp.com/167p1k11', phoneNumber: phoneNumber);
+    print("---------------------------------RETURNED DATA: ${data.toString()}-------------------");
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -34,6 +53,7 @@ class _HomePageState extends State<HomePage> {
                   TextField(
                     decoration: kInputdecoration.copyWith(hintText: 'Eg:07XXXXXXXX'),
                     keyboardType: TextInputType.number,
+                    controller: _phoneNumberTextController,
                   ),
                   SizedBox(height: 10,),
                   Text('Enter Amount'),
@@ -41,6 +61,7 @@ class _HomePageState extends State<HomePage> {
                   TextField(
                     decoration: kInputdecoration,
                     keyboardType: TextInputType.number,
+                    controller: _amountTextController,
                   ),
                   SizedBox(height: 10,),
                   MaterialButton(
@@ -48,14 +69,18 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(30.0)),
                     child: Text("Pay",
                       style: TextStyle(fontWeight: FontWeight.bold,
-                          color: Colors.black38),
+                          color: Colors.black),
                     ),
                     elevation: 1.0,
                     height: 50.0,
                     minWidth: double.infinity,
                     color: cream,
-                    onPressed:(){
-                      print('I HAVE BEEN PRESSED !!');
+                    onPressed:() {
+                      phoneNumber = _phoneNumberTextController.text.toString();
+                      amount = _amountTextController.text;
+                      makePayment(phoneNumber: phoneNumber,amount: amount);
+                      _phoneNumberTextController.text='';
+                      _amountTextController.text='';
                     },
                   )
                 ],
