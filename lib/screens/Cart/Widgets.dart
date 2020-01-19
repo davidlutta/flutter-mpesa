@@ -2,6 +2,7 @@ import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mpesa/bloc/CartListBloc.dart';
+import 'package:flutter_mpesa/bloc/listStyleColorBloc.dart';
 import 'package:flutter_mpesa/model/FoodItem.dart';
 
 class CartBody extends StatelessWidget {
@@ -41,8 +42,8 @@ class CartBody extends StatelessWidget {
         child: Text(
           "No more items left in the cart",
           style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[50],
+              fontWeight: FontWeight.w200,
+              color: Colors.black38,
               fontSize: 20),
         ),
       ),
@@ -81,9 +82,63 @@ class CartListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Draggable(
+      data: foodItem,
+      maxSimultaneousDrags: 1,
+      child: DraggableChild(foodItem: foodItem),
+      feedback: DraggableChildFeedback(foodItem: foodItem),
+      childWhenDragging: foodItem.quantity > 1
+          ? DraggableChild(
+              foodItem: foodItem,
+            )
+          : Container(),
+    );
+  }
+}
+
+class DraggableChild extends StatelessWidget {
+  const DraggableChild({
+    Key key,
+    @required this.foodItem,
+  }) : super(key: key);
+
+  final FoodItem foodItem;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(bottom: 25),
       child: ItemContent(foodItem),
+    );
+  }
+}
+
+class DraggableChildFeedback extends StatelessWidget {
+  const DraggableChildFeedback({
+    Key key,
+    @required this.foodItem,
+  }) : super(key: key);
+
+  final FoodItem foodItem;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorBloc bloc = BlocProvider.getBloc<ColorBloc>();
+    return Opacity(
+      opacity: 0.7,
+      child: Material(
+        child: StreamBuilder<Color>(
+            stream: bloc.colorStream,
+            builder: (context, snapshot) {
+              return Container(
+                margin: EdgeInsets.only(bottom: 25),
+                child: ItemContent(foodItem),
+                decoration: BoxDecoration(
+                    color:
+                        snapshot.data != null ? snapshot.data : Colors.white),
+              );
+            }),
+      ),
     );
   }
 }
@@ -153,26 +208,51 @@ class CustomAppBar extends StatelessWidget {
             },
           ),
         ),
-        GestureDetector(
-          child: Padding(
-            padding: EdgeInsets.all(5),
-            child: Icon(
-              CupertinoIcons.delete,
-              size: 35,
-            ),
-          ),
-          onTap: () {},
-        )
+        DragTargetWidget(),
       ],
+    );
+  }
+}
+
+class DragTargetWidget extends StatefulWidget {
+  @override
+  _DragTargetWidgetState createState() => _DragTargetWidgetState();
+}
+
+class _DragTargetWidgetState extends State<DragTargetWidget> {
+  final CartListBloc bloc = BlocProvider.getBloc<CartListBloc>();
+  final ColorBloc colorBloc = BlocProvider.getBloc<ColorBloc>();
+
+  @override
+  Widget build(BuildContext context) {
+    return DragTarget<FoodItem>(
+      onWillAccept: (FoodItem foodItem) {
+        colorBloc.setColor(Colors.red);
+        return true;
+      },
+      onAccept: (FoodItem foodItem) {
+        bloc.removeFromList(foodItem);
+        colorBloc.setColor(Colors.white);
+      },
+      onLeave: (FoodItem foodItem){
+        colorBloc.setColor(Colors.white);
+      },
+      builder: (context, incoming, rejected) {
+        return Padding(
+          padding: EdgeInsets.all(5.0),
+          child: Icon(
+            CupertinoIcons.delete,
+            size: 35,
+          ),
+        );
+      },
     );
   }
 }
 
 class BottomBar extends StatelessWidget {
   final List<FoodItem> foodItems;
-
   BottomBar(this.foodItems);
-
   @override
   Widget build(BuildContext context) {
     return Container(
