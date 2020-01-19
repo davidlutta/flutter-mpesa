@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         title: 'Salad Delivery',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.lime,
+          primarySwatch: Colors.teal,
         ),
         home: Home(),
       ),

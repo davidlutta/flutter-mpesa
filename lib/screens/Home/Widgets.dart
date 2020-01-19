@@ -1,7 +1,13 @@
+import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mpesa/bloc/CartListBloc.dart';
+import 'package:flutter_mpesa/model/FoodItem.dart';
+import 'package:flutter_mpesa/screens/Cart/Cart.dart';
 
 class CustomAppBar extends StatelessWidget {
+  final CartListBloc bloc = BlocProvider.getBloc<CartListBloc>();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -10,23 +16,43 @@ class CustomAppBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Icon(Icons.menu),
-          GestureDetector(
-            onTap: () {},
-            child: Container(
-              margin: EdgeInsets.only(right: 30),
-              child: Text(
-                "0",
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-              padding: EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                  color: Colors.teal[700],
-                  borderRadius: BorderRadius.circular(50)),
-            ),
+          StreamBuilder(
+            stream: bloc.listStream,
+            builder: (context, snapshot) {
+              List<FoodItem> foodItems = snapshot.data;
+              int length = foodItems != null ? foodItems.length : 0;
+              return buildGestureDetector(length, context, foodItems);
+            },
           )
         ],
+      ),
+    );
+  }
+
+  GestureDetector buildGestureDetector(int length, BuildContext context,
+      List<FoodItem> foodItems) {
+    return GestureDetector(
+      onTap: () {
+        if (length > 0) {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => Cart()));
+        } else {
+          return;
+        }
+      },
+      child: Container(
+        margin: EdgeInsets.only(right: 30),
+        child: Text(
+          length.toString(),
+          style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w300
+          ),
+        ),
+        padding: EdgeInsets.all(15),
+        decoration: BoxDecoration(
+            color: Colors.teal[700],
+            borderRadius: BorderRadius.circular(50)),
       ),
     );
   }
@@ -135,11 +161,10 @@ class CategoryListItem extends StatelessWidget {
   final int availability;
   final bool selected;
 
-  CategoryListItem(
-      {@required this.categoryIcon,
-      @required this.categoryName,
-      @required this.availability,
-      @required this.selected});
+  CategoryListItem({@required this.categoryIcon,
+    @required this.categoryName,
+    @required this.availability,
+    @required this.selected});
 
   @override
   Widget build(BuildContext context) {
@@ -207,12 +232,11 @@ class Items extends StatelessWidget {
   final String hotel;
   final String itemName;
 
-  Items(
-      {@required this.leftAligned,
-      @required this.imageUrl,
-      @required this.itemPrice,
-      @required this.hotel,
-      @required this.itemName});
+  Items({@required this.leftAligned,
+    @required this.imageUrl,
+    @required this.itemPrice,
+    @required this.hotel,
+    @required this.itemName});
 
   @override
   Widget build(BuildContext context) {
@@ -243,7 +267,7 @@ class Items extends StatelessWidget {
                           : Radius.circular(0)),
                   child: Image.network(
                     imageUrl,
-                    fit: BoxFit.fill,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
@@ -266,7 +290,7 @@ class Items extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          "\$$itemPrice",
+                          "\ KES$itemPrice",
                           style: TextStyle(
                               fontWeight: FontWeight.w700, fontSize: 18),
                         ),
@@ -284,7 +308,7 @@ class Items extends StatelessWidget {
                               fontSize: 15,
                             ),
                             children: [
-                              TextSpan(text: "by"),
+                              TextSpan(text: "by "),
                               TextSpan(
                                   text: hotel,
                                   style: TextStyle(fontWeight: FontWeight.w700))
