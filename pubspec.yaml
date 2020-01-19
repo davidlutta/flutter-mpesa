@@ -11,6 +11,8 @@ dependencies:
     sdk: flutter
   http: ^0.12.0+2
   intl: ^0.16.0
+  bloc_pattern: any
+  rxdart: any
 
   cupertino_icons: ^0.1.2
 
