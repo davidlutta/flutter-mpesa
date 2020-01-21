@@ -2,9 +2,11 @@ import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mpesa/bloc/CartListBloc.dart';
 import 'package:flutter_mpesa/bloc/listStyleColorBloc.dart';
-import 'package:flutter_mpesa/screens/Home/Home.dart';
+import 'package:flutter_mpesa/screens/Screens.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -21,7 +23,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.teal,
         ),
-        home: Home(),
+        home: SignUpScreen(),
       ),
     );
   }

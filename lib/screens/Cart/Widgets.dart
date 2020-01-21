@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mpesa/bloc/CartListBloc.dart';
 import 'package:flutter_mpesa/bloc/listStyleColorBloc.dart';
 import 'package:flutter_mpesa/model/FoodItem.dart';
+import 'package:flutter_mpesa/services/MpesaService.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../env.dart';
 
 class CartBody extends StatelessWidget {
   final List<FoodItem> foodItems;
@@ -42,9 +46,7 @@ class CartBody extends StatelessWidget {
         child: Text(
           "No more items left in the cart",
           style: TextStyle(
-              fontWeight: FontWeight.w200,
-              color: Colors.black38,
-              fontSize: 20),
+              fontWeight: FontWeight.w200, color: Colors.black38, fontSize: 20),
         ),
       ),
     );
@@ -234,7 +236,7 @@ class _DragTargetWidgetState extends State<DragTargetWidget> {
         bloc.removeFromList(foodItem);
         colorBloc.setColor(Colors.white);
       },
-      onLeave: (FoodItem foodItem){
+      onLeave: (FoodItem foodItem) {
         colorBloc.setColor(Colors.white);
       },
       builder: (context, incoming, rejected) {
@@ -252,7 +254,34 @@ class _DragTargetWidgetState extends State<DragTargetWidget> {
 
 class BottomBar extends StatelessWidget {
   final List<FoodItem> foodItems;
+  double totalAmount = 0.0;
   BottomBar(this.foodItems);
+
+  void makePayment(BuildContext context) async {
+    MpesaService mpesaService = MpesaService(
+        clientKey: Environment.CONSUMERKEY,
+        clientSecret: Environment.CONSUMERSECRET,
+        passKey: Environment.CONSUMERPASSKEY,
+        baseurl: Environment.baseURl);
+    var preferences = await SharedPreferences.getInstance();
+    String phoneNumber = preferences.getString(Environment.phonePrefsKey) ?? '';
+    print(
+        '-------------------- PHONE NUMBER IS: $phoneNumber -------------------');
+    var data = await mpesaService.initializeMpesa(
+        amount: totalAmount.toStringAsFixed(0),
+        callbackUrl: 'http://mpesa-requestbin.herokuapp.com/167p1k11',
+        phoneNumber: phoneNumber);
+    print(
+        "---------------------------------RETURNED DATA: ${data
+            .toString()} -------------------");
+    if (data['ResponseCode'] == 0) {
+      Navigator.pop(context);
+    } else {
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text("Payment Failed 😭: ${data['errorMessage']}"),));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -260,7 +289,7 @@ class BottomBar extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          totalAmount(foodItems),
+          totalAmountWid(foodItems),
           Divider(
             height: 1,
             color: Colors.grey[700],
@@ -268,29 +297,39 @@ class BottomBar extends StatelessWidget {
           SizedBox(
             height: 10,
           ),
-          nextButtonBar(),
+          nextButtonBar(context),
         ],
       ),
     );
   }
 
-  Container nextButtonBar() {
-    return Container(
-      margin: EdgeInsets.only(right: 25),
-      padding: EdgeInsets.all(25),
-      decoration: BoxDecoration(
-          color: Color(0xff24feb3), borderRadius: BorderRadius.circular(15)),
-      child: Center(
-        child: Text(
-          "Checkout",
-          style: TextStyle(
-              fontWeight: FontWeight.w700, color: Colors.white, fontSize: 20.0),
+  Widget nextButtonBar(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        print(
+            '------------- TOTAL AMOUNT IS: ${totalAmount
+                .toString()} -----------');
+        makePayment(context);
+      },
+      child: Container(
+        margin: EdgeInsets.only(right: 25),
+        padding: EdgeInsets.all(25),
+        decoration: BoxDecoration(
+            color: Color(0xff24feb3), borderRadius: BorderRadius.circular(50)),
+        child: Center(
+          child: Text(
+            "Checkout",
+            style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+                fontSize: 20.0),
+          ),
         ),
       ),
     );
   }
 
-  Container totalAmount(List<FoodItem> foodItem) {
+  Container totalAmountWid(List<FoodItem> foodItem) {
     return Container(
       margin: EdgeInsets.only(
         right: 10,
@@ -313,7 +352,6 @@ class BottomBar extends StatelessWidget {
   }
 
   String returnTotalAmount(List<FoodItem> foodItems) {
-    double totalAmount = 0.0;
     for (int i = 0; i < foodItems.length; i++) {
       totalAmount = totalAmount + foodItems[i].price * foodItems[i].quantity;
     }

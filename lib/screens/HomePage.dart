@@ -22,10 +22,7 @@ class _HomePageState extends State<HomePage> {
   TextEditingController _phoneNumberTextController = TextEditingController();
   TextEditingController _amountTextController = TextEditingController();
 
-  void makePayment({String phoneNumber, String amount}) async{
-    var data = await mpesaService.initializeMpesa(amount: amount, callbackUrl: 'http://mpesa-requestbin.herokuapp.com/167p1k11', phoneNumber: phoneNumber);
-    print("---------------------------------RETURNED DATA: ${data.toString()}-------------------");
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +75,7 @@ class _HomePageState extends State<HomePage> {
                     onPressed:() {
                       phoneNumber = _phoneNumberTextController.text.toString();
                       amount = _amountTextController.text;
-                      makePayment(phoneNumber: phoneNumber,amount: amount);
+//                      makePayment(phoneNumber: phoneNumber,amount: amount);
                       _phoneNumberTextController.text='';
                       _amountTextController.text='';
                     },

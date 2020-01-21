@@ -13,6 +13,7 @@ dependencies:
   intl: ^0.16.0
   bloc_pattern: any
   rxdart: any
+  shared_preferences: any
 
   cupertino_icons: ^0.1.2
 

@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mpesa/env.dart';
-import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class MpesaService {
   final String _baseUrl;
@@ -60,8 +60,8 @@ class MpesaService {
         String actualTimeStamp = formatter.format(rawTimeStamp);
 
         String _rawPassword = businessShortCode + _passKey + actualTimeStamp;
-        List<int> _paswordBytes = utf8.encode(_rawPassword);
-        String password = base64.encode(_paswordBytes);
+        List<int> _passwordBytes = utf8.encode(_rawPassword);
+        String password = base64.encode(_passwordBytes);
 
         String token = await _authenticate();
 

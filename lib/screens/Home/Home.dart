@@ -1,11 +1,14 @@
-import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mpesa/bloc/CartListBloc.dart';
 import 'package:flutter_mpesa/model/FoodItem.dart';
 
 import 'Widgets.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,35 +54,4 @@ class UpperSection extends StatelessWidget {
   }
 }
 
-class ItemContainer extends StatelessWidget {
-  final FoodItem foodItem;
 
-  ItemContainer({this.foodItem});
-
-  final CartListBloc bloc = BlocProvider.getBloc<CartListBloc>();
-
-  addToCart(FoodItem foodItem) {
-    bloc.addToList(foodItem);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        addToCart(foodItem);
-        final snackBar = SnackBar(
-          content: Text("${foodItem.title} added to the cart"),
-          duration: Duration(milliseconds: 550),
-        );
-        Scaffold.of(context).showSnackBar(snackBar);
-      },
-      child: Items(
-        hotel: foodItem.hotel,
-        itemName: foodItem.title,
-        itemPrice: foodItem.price,
-        leftAligned: foodItem.id % 2 == 0 ? true : false,
-        imageUrl: foodItem.imageUrl,
-      ),
-    );
-  }
-}
