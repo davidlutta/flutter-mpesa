@@ -33,7 +33,13 @@ class CartProvider {
     return foodItems;
   }
 
+
+  void clearList(){
+    foodItems.clear();
+  }
+
   void increasesItemQuantity(FoodItem foodItem) => foodItem.incrementQuantity();
 
   void decreaseItemQuantity(FoodItem foodItem) => foodItem.decrementQuantity();
+
 }

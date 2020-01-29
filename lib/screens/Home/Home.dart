@@ -47,7 +47,6 @@ class UpperSection extends StatelessWidget {
           SizedBox(
             height: 10,
           ),
-//          categories()
         ],
       ),
     );

@@ -141,51 +141,6 @@ Widget searchBar() {
   );
 }
 
-Widget categories() {
-  return Container(
-    height: 185,
-    child: ListView(
-      scrollDirection: Axis.horizontal,
-      children: <Widget>[
-        CategoryListItem(
-            categoryIcon: Icons.bug_report,
-            categoryName: "Fresh Salads",
-            availability: 12,
-            selected: true),
-        CategoryListItem(
-            categoryIcon: Icons.bug_report,
-            categoryName: "Frozen Salads",
-            availability: 12,
-            selected: false),
-        CategoryListItem(
-            categoryIcon: Icons.bug_report,
-            categoryName: "Kenyan Salads",
-            availability: 12,
-            selected: false),
-        CategoryListItem(
-            categoryIcon: Icons.bug_report,
-            categoryName: "European Salads",
-            availability: 12,
-            selected: false),
-        CategoryListItem(
-            categoryIcon: Icons.bug_report,
-            categoryName: "American Salads",
-            availability: 12,
-            selected: false),
-        CategoryListItem(
-            categoryIcon: Icons.bug_report,
-            categoryName: "Italian Salads",
-            availability: 12,
-            selected: false),
-        CategoryListItem(
-            categoryIcon: Icons.bug_report,
-            categoryName: "Greek Salads",
-            availability: 12,
-            selected: false),
-      ],
-    ),
-  );
-}
 
 class CategoryListItem extends StatelessWidget {
   final IconData categoryIcon;

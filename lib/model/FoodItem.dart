@@ -53,4 +53,8 @@ class FoodItem{
   void decrementQuantity() {
     this.quantity=this.quantity-1;
   }
+
+  void clearQuantity(){
+    this.quantity = 0;
+  }
 }

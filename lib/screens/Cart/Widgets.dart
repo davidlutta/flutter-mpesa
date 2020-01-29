@@ -253,6 +253,8 @@ class _DragTargetWidgetState extends State<DragTargetWidget> {
 }
 
 class BottomBar extends StatelessWidget {
+  final CartListBloc bloc = BlocProvider.getBloc<CartListBloc>();
+
   final List<FoodItem> foodItems;
   double totalAmount = 0.0;
   BottomBar(this.foodItems);
@@ -274,12 +276,15 @@ class BottomBar extends StatelessWidget {
     print(
         "---------------------------------RETURNED DATA: ${data
             .toString()} -------------------");
-    if (data['ResponseCode'] == 0) {
+/*    if (data['ResponseCode'] == 0) {
       Navigator.pop(context);
     } else {
       Scaffold.of(context).showSnackBar(SnackBar(
         content: Text("Payment Failed 😭: ${data['errorMessage']}"),));
-    }
+    }*/
+    bloc.clearList();
+    Navigator.pop(context);
+
   }
 
   @override
@@ -306,9 +311,6 @@ class BottomBar extends StatelessWidget {
   Widget nextButtonBar(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print(
-            '------------- TOTAL AMOUNT IS: ${totalAmount
-                .toString()} -----------');
         makePayment(context);
       },
       child: Container(
